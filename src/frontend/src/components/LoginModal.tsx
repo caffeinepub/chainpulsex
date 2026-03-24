@@ -6,6 +6,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useApp } from "../context/AppContext";
 
+const ADMIN_USERNAME = "sandeepkarna977";
+const ADMIN_PASSWORD = "Sandeep@321";
+
 export function LoginModal({ onClose }: { onClose: () => void }) {
   const { login } = useApp();
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -15,9 +18,20 @@ export function LoginModal({ onClose }: { onClose: () => void }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim()) return;
-    // Demo: "admin" username gets admin role
-    const role = username.toLowerCase() === "admin" ? "admin" : "user";
-    login(username, role);
+
+    if (username === ADMIN_USERNAME) {
+      if (password !== ADMIN_PASSWORD) {
+        toast.error("Incorrect password.");
+        return;
+      }
+      login(username, "admin");
+      toast.success(`Welcome, ${username}! 🎉`);
+      onClose();
+      return;
+    }
+
+    // Regular user login
+    login(username, "user");
     toast.success(`Welcome, ${username}! 🎉`);
     onClose();
   };
@@ -82,7 +96,7 @@ export function LoginModal({ onClose }: { onClose: () => void }) {
             <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username (try 'admin')"
+              placeholder="Enter username"
               className="bg-muted/50 border-border"
             />
           </div>
@@ -102,10 +116,6 @@ export function LoginModal({ onClose }: { onClose: () => void }) {
             {tab === "login" ? "Login" : "Create Account"}
           </Button>
         </form>
-
-        <p className="text-xs text-muted-foreground text-center mt-4">
-          Tip: Use username "admin" to access Admin panel
-        </p>
       </div>
     </div>
   );

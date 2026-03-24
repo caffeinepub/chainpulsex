@@ -29,6 +29,7 @@ const navItems = [
   { path: "/markets", label: "Markets", icon: TrendingUp },
   { path: "/earning", label: "Earning", icon: DollarSign },
   { path: "/deposit", label: "Deposit", icon: Wallet },
+  { path: "/admin", label: "Admin", icon: Shield },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -36,11 +37,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-
-  const allNavItems =
-    user.role === "admin"
-      ? [...navItems, { path: "/admin", label: "Admin", icon: Shield }]
-      : navItems;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -71,13 +67,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {allNavItems.map(({ path, label, icon: Icon }) => {
+          {navItems.map(({ path, label, icon: Icon }) => {
             const active = location === path;
             return (
               <Link
                 key={path}
                 to={path}
                 onClick={() => setSidebarOpen(false)}
+                data-ocid="nav.link"
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   active
                     ? "text-foreground"
@@ -95,6 +92,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
               >
                 <Icon size={16} />
                 {label}
+                {label === "Admin" && user.role !== "admin" && (
+                  <span
+                    className="ml-auto text-xs px-1.5 py-0.5 rounded"
+                    style={{
+                      background: "oklch(0.55 0.22 295 / 0.2)",
+                      color: "oklch(0.70 0.20 295)",
+                      border: "1px solid oklch(0.55 0.22 295 / 0.3)",
+                    }}
+                  >
+                    🔒
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -204,6 +213,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 size="sm"
                 className="btn-cyan"
                 onClick={() => setShowLogin(true)}
+                data-ocid="nav.primary_button"
               >
                 <LogIn size={14} className="mr-1" /> Login
               </Button>
